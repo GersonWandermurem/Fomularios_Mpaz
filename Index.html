@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro de Lançamentos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        #logo {
+            width: 100%;
+            max-width: 150px;
+            opacity: 0.7;
+        }
+
+        .formulario {
+            text-align: left;
+            max-width: 300px;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        .formulario label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .formulario input[type="text"],
+        .formulario input[type="date"],
+        .formulario input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+        }
+
+        .formulario #data {
+            width: 100%;
+        }
+
+        .formulario #valor {
+            width: 100%;
+        }
+
+        .formulario #descricao {
+            width: 100%;
+        }
+
+        .formulario #tipo label {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .formulario #btnCadastrar {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.5s ease;
+        }
+
+        .formulario #btnCadastrar:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .formulario #btnCadastrar.enabled {
+            animation: blinker 1s linear infinite;
+        }
+
+        .formulario .pesquisar {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .formulario .pesquisar input[type="text"] {
+            flex-grow: 1;
+            padding: 10px;
+        }
+
+        .formulario .pesquisar button {
+            background-color: transparent;
+            color: #008CBA;
+            border: none;
+            padding: 10px 10px;
+            cursor: pointer;
+        }
+
+        .formulario .pesquisar button:hover {
+            color: #005f7b;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .delete-btn {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #005f7b;
+        }
+
+        #tabela-container {
+            max-width: 800px;
+            margin: 0 auto;
+            margin-top: 20px;
+        }
+
+        @keyframes blinker {
+            50% {
+                background-color: #45a049;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img id="logo" src="https://drive.google.com/uc?id=1TxTBkDNw3By1hdT52QnmAg_49MLDlGzY" alt="Logo" />
+
+        <div class="formulario">
+            <h3>Registro de Lançamentos</h3>
+            <label for="nomeEmpresa">Nome da Empresa</label>
+            <input type="text" id="nomeEmpresa" value="GERSON" readonly>
+
+            <label for="data">Data (dd/mm/aaaa)</label>
+            <input type="date" id="data" value="<?php echo date('Y-m-d'); ?>" required>
+
+            <label for="valor">Valor (0,00)</label>
+            <input type="text" id="valor" placeholder="0,00" pattern="\d+\.\d{2}" required>
+
+            <label for="descricao">Descrição</label>
+            <input type="text" id="descricao" required>
+
+            <div id="tipo">
+                <label for="receita">Receita</label>
+                <input type="radio" id="receita" name="tipo" value="Receita" checked>
+
+                <label for="despesa">Despesa</label>
+                <input type="radio" id="despesa" name="tipo" value="Despesa">
+            </div>
+
+            <button id="btnCadastrar" onclick="cadastrarLancamento()" disabled>Cadastrar</button>
+
+            <div class="pesquisar">
+                <input type="text" id="searchDescricao" placeholder="Pesquisar por Descrição">
+                <button onclick="filtrarTabela()">🔍</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="tabela-container">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Nome da Empresa</th>
+                <th>Data</th>
+                <th>Valor</th>
+                <th>Descrição</th>
+                <th>Tipo</th>
+                <th>Opções</th>
+            </tr>
+        </table>
+    </div>
+    <script src="https://raw.githubusercontent.com/GersonWandermurem/Fomularios_Mpaz_Empresa_Gerson/main/load-data.js"></script>
+
+    <script>
+        function cadastrarLancamento() {
+            var nomeEmpresa = document.getElementById("nomeEmpresa").value;
+            var data = document.getElementById("data").value;
+            var valor = document.getElementById("valor").value;
+            var descricao = document.getElementById("descricao").value;
+            var tipo = document.querySelector('input[name="tipo"]:checked').value;
+
+            adicionarLancamento(nomeEmpresa, data, valor, descricao, tipo);
+
+            limparCampos();
+        }
+
+        function adicionarLancamento(nomeEmpresa, data, valor, descricao, tipo) {
+            var table = document.querySelector("table");
+            var row = table.insertRow(1);
+
+            var id = table.rows.length - 1;
+
+            var cell1 = row.insertCell(0);
+            var cell2 = row.insertCell(1);
+            var cell3 = row.insertCell(2);
+            var cell4 = row.insertCell(3);
+            var cell5 = row.insertCell(4);
+            var cell6 = row.insertCell(5);
+            var cell7 = row.insertCell(6);
+
+            cell1.innerHTML = id;
+            cell2.innerHTML = nomeEmpresa;
+            cell3.innerHTML = formatarData(data);
+            cell4.innerHTML = formatarValor(valor);
+            cell5.innerHTML = descricao;
+            cell6.innerHTML = tipo;
+            cell7.innerHTML = `<button class="delete-btn" onclick="excluirLancamento(${id})">Excluir</button>`;
+        }
+
+        function formatarData(data) {
+            var partesData = data.split("-");
+            return partesData[2] + "/" + partesData[1] + "/" + partesData[0];
+        }
+
+        function formatarValor(valor) {
+            return parseFloat(valor).toFixed(2).replace(".", ",");
+        }
+
+        function limparCampos() {
+            document.getElementById("data").value = "";
+            document.getElementById("valor").value = "";
+            document.getElementById("descricao").value = "";
+            document.getElementById("receita").checked = true;
+            document.getElementById("despesa").checked = false;
+            document.getElementById("btnCadastrar").disabled = true;
+            document.getElementById("btnCadastrar").classList.remove("enabled");
+        }
+
+        function excluirLancamento(id) {
+            var table = document.querySelector("table");
+            table.deleteRow(id);
+            reorganizarIDs();
+        }
+
+        function reorganizarIDs() {
+            var table = document.querySelector("table");
+            for (var i = 1; i < table.rows.length; i++) {
+                table.rows[i].cells[0].innerHTML = i;
+            }
+        }
+
+        document.getElementById("data").addEventListener("input", function () {
+            validarCampos();
+        });
+
+        document.getElementById("valor").addEventListener("input", function () {
+            validarCampos();
+        });
+
+        document.getElementById("descricao").addEventListener("input", function () {
+            validarCampos();
+        });
+
+        document.querySelector('input[name="tipo"]').addEventListener("change", function () {
+            validarCampos();
+        });
+
+        function validarCampos() {
+            var data = document.getElementById("data").value;
+            var valor = document.getElementById("valor").value;
+            var descricao = document.getElementById("descricao").value;
+            var tipo = document.querySelector('input[name="tipo"]:checked').value;
+            var btnCadastrar = document.getElementById("btnCadastrar");
+
+            if (data && valor && descricao) {
+                btnCadastrar.disabled = false;
+                btnCadastrar.classList.add("enabled");
+            } else {
+                btnCadastrar.disabled = true;
+                btnCadastrar.classList.remove("enabled");
+            }
+        }
+
+        validarCampos();
+
+        function filtrarTabela() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("searchDescricao");
+            filter = input.value.toUpperCase();
+            table = document.querySelector("table");
+            tr = table.getElementsByTagName("tr");
+            for (i = 1; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[4];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
